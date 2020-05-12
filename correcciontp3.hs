@@ -51,7 +51,7 @@ precio:: Propiedad-> Int
 precio (_, plata)= plata 
 
 esAccuOferente :: Participante -> Bool
-esAccuOferente  unParticipante = esDe unParticipante 
+esAccuOferente  unParticipante = tipoDeParticipante unParticipante 
 -- cobrarAlquileres: suma $10 por cada propiedad barata y $20 por cada propiedad cara obtenida. Las propiedades baratas son aquellas cuyo precio es menor a $150.
 
 cobrarAlquileres :: Accion
@@ -70,8 +70,8 @@ pagarAAccionistas unParticipante
     |otherwise = unParticipante {cantidadDeDinero = cantidadDeDinero unParticipante - 100}
 
 esAccionista :: Participante -> Bool
-esAccionista  unParticipante = esDe unParticipante
+esAccionista  unParticipante = tipoDeParticipante unParticipante
 
 
-esDe :: Participante -> Bool
-esDe unParticipante = tacticaDeJuego unParticipante == "Oferente singular" || tacticaDeJuego unParticipante   == "Accionista" 
+tipoDeParticipante :: Participante -> Bool
+tipoDeParticipante unParticipante = tacticaDeJuego unParticipante == "Oferente singular" || tacticaDeJuego unParticipante   == "Accionista" 
