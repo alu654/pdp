@@ -55,10 +55,10 @@ esAccuOferente  unParticipante = esDe unParticipante
 -- cobrarAlquileres: suma $10 por cada propiedad barata y $20 por cada propiedad cara obtenida. Las propiedades baratas son aquellas cuyo precio es menor a $150.
 
 cobrarAlquileres :: Accion
-cobrarAlquileres unParticipante = unParticipante {cantidadDeDinero = cantidadDeDinero unParticipante + (sum.(map unaPropiedadBarata).propiedadesCompradas) unParticipante }
+cobrarAlquileres unParticipante = unParticipante {cantidadDeDinero = cantidadDeDinero unParticipante + (sum.(map costoPropiedad).propiedadesCompradas) unParticipante }
 
-unaPropiedadBarata :: Propiedad -> Int
-unaPropiedadBarata unaPropiedad 
+costoPropiedad :: Propiedad -> Int
+costoPropiedad unaPropiedad 
     | snd unaPropiedad < 150 = 10
     | otherwise = 20    
 
