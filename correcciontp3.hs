@@ -1,3 +1,4 @@
+  
 import Text.Show.Functions()
 
 data Participante = UnParticipante { 
@@ -50,7 +51,7 @@ precio:: Propiedad-> Int
 precio (_, plata)= plata 
 
 esAccuOferente :: Participante -> Bool
-esAccuOferente  unParticipante = esDe "Oferente singular" || esDe "Accionista"
+esAccuOferente  unParticipante = esDe unParticipante 
 -- cobrarAlquileres: suma $10 por cada propiedad barata y $20 por cada propiedad cara obtenida. Las propiedades baratas son aquellas cuyo precio es menor a $150.
 
 cobrarAlquileres :: Accion
@@ -69,8 +70,8 @@ pagarAAccionistas unParticipante
     |otherwise = unParticipante {cantidadDeDinero = cantidadDeDinero unParticipante - 100}
 
 esAccionista :: Participante -> Bool
-esAccionista  tactica = esDe "Accionista"
+esAccionista  unParticipante = esDe unParticipante
 
 
-esDe :: String -> Bool
-esDe tactica = tactica == "Oferente singular" || tactica  == "Accionista" 
+esDe :: Participante -> Bool
+esDe unParticipante = tacticaDeJuego unParticipante == "Oferente singular" || tacticaDeJuego unParticipante   == "Accionista" 
