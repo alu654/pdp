@@ -59,7 +59,7 @@ cobrarAlquileres unParticipante = unParticipante {cantidadDeDinero = cantidadDeD
 
 costoPropiedad :: Propiedad -> Int
 costoPropiedad unaPropiedad 
-    | snd unaPropiedad < 150 = 10
+    | precio unaPropiedad < 150 = 10
     | otherwise = 20    
 
 --pagarAAccionistas: resta $100 para todos los casos excepto que la táctica sea “Accionista”, en ese caso suma $200.
