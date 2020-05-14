@@ -87,3 +87,32 @@ esAccionista  unParticipante = tacticaDeJuego unParticipante   == "Accionista"
 esOferenteSingular :: Participante -> Bool
 esOferenteSingular unParticipante = tacticaDeJuego unParticipante   == "Oferente singular" 
 
+--hacerBerrinchePor: cuando una persona hace un berrinche por una propiedad se le suman $10 y se la hace gritar, la persona sigue haciendo berrinche hasta que llegue a comprar la propiedad que quiere.
+
+
+hacerBerrinchePor ::  Propiedad -> Accion
+hacerBerrinchePor  unaPropiedad unParticipante -- ?
+        | puedeComprar unaPropiedad unParticipante = adquirirPropiedad unaPropiedad unParticipante
+        | otherwise = hacerBerrinchePor unaPropiedad ((cambiarDinero (+10) . gritar) unParticipante )
+
+--                5           7         True
+puedeComprar :: Propiedad -> Participante -> Bool
+puedeComprar unaPropiedad unParticipante = cantidadDeDinero unParticipante >= precio unaPropiedad  
+
+
+--últimaRonda, que dado un participante retorna una acción equivalente a todas sus acciones.
+ultimaRonda :: Participante->Accion
+ultimaRonda unParticipante = foldl1 (.) (accionesDelJuego unParticipante)
+
+--Hacer una función juegoFinal la cual toma dos participantes y devuelve al ganador.
+juegoFinal :: Participante -> Participante -> Participante
+juegoFinal unParticipante otroParticipante
+    | dineroEnUtimaRonda unParticipante > dineroEnUtimaRonda otroParticipante = jugarUltimaRonda unParticipante
+    | otherwise = jugarUltimaRonda otroParticipante
+
+
+jugarUltimaRonda :: Accion
+jugarUltimaRonda unParticipante = (ultimaRonda unParticipante) unParticipante
+
+dineroEnUtimaRonda ::  Participante -> Int
+dineroEnUtimaRonda unParticipante = (cantidadDeDinero.jugarUltimaRonda) unParticipante
