@@ -1,4 +1,3 @@
-  
 import Text.Show.Functions()
 
 data Participante = UnParticipante { 
@@ -21,16 +20,24 @@ manuel = UnParticipante "Manuel" 500 "Oferente singular" [] [pasarPorElBanco, en
 -- pasarPorElBanco: aumenta el dinero del jugador en $40 y cambia su táctica a “Comprador compulsivo”.
 
 pasarPorElBanco :: Accion
-pasarPorElBanco unParticipante  = unParticipante {cantidadDeDinero  =  cambiarDinero unParticipante 40 , tacticaDeJuego = "Comprador compulsivo" }
+pasarPorElBanco  unParticipante  =  (cambiarDinero (+40) . cambiartacticaDeJuego "Comprador compulsivo")unParticipante
+
+cambiartacticaDeJuego :: String -> Accion
+cambiartacticaDeJuego unaTactica unParticipante = unParticipante {tacticaDeJuego =  unaTactica}
 
 -- enojarse: suma $50 y agrega gritar a sus acciones.
 
 enojarse :: Accion
-enojarse unParticipante =  unParticipante {cantidadDeDinero  =  cambiarDinero unParticipante 50 , accionesDelJuego = accionesDelJuego unParticipante ++ [gritar]} 
+enojarse unParticipante = (cambiarDinero (+50) . agregarAccion gritar) unParticipante
+
+agregarAccion :: Accion -> Accion
+agregarAccion  unAccion unParticipante  = unParticipante {accionesDelJuego = accionesDelJuego unParticipante ++ [unAccion]}
 
 
-cambiarDinero :: Participante -> Int->  Int --500 40 = 540 
-cambiarDinero unParticipante dinero = (cantidadDeDinero unParticipante + dinero ) 
+cambiarDinero ::  (Int->Int) -> Participante -> Participante
+cambiarDinero unaFuncion unParticipante = unParticipante { cantidadDeDinero = unaFuncion ( cantidadDeDinero unParticipante ) }
+
+
 -- gritar: agrega “AHHHH” al principio de su nombre.
 
 gritar :: Accion 
@@ -41,17 +48,21 @@ gritar unParticipante = unParticipante { nombre  = "AHHHH" ++ nombre unParticipa
 
 subastar :: Propiedad -> Accion
 subastar adquirida unParticipante 
-    | esAccuOferente unParticipante = agregarPropiedad adquirida unParticipante
+    | esAccionistauOferente unParticipante = adquirirPropiedad adquirida unParticipante
     | otherwise = unParticipante
 
-agregarPropiedad :: Propiedad -> Accion
-agregarPropiedad esAccionistaganada unParticipante = unParticipante { cantidadDeDinero = cantidadDeDinero unParticipante - precio esAccionistaganada, propiedadesCompradas = propiedadesCompradas unParticipante ++ [esAccionistaganada] }
+adquirirPropiedad :: Propiedad -> Accion
+adquirirPropiedad unaPropiedad unParticipante = (cambiarDinero (subtract (precio unaPropiedad))  .agregarPropiedad unaPropiedad) unParticipante 
+
+
+agregarPropiedad:: Propiedad -> Participante -> Participante
+agregarPropiedad unaPropiedad unParticipante = unParticipante {propiedadesCompradas = unaPropiedad : (propiedadesCompradas unParticipante)   }
 
 precio:: Propiedad-> Int
 precio (_, plata)= plata 
 
-esAccuOferente :: Participante -> Bool
-esAccuOferente  unParticipante = tipoDeParticipante unParticipante 
+esAccionistauOferente :: Participante -> Bool
+esAccionistauOferente  unParticipante = esAccionista unParticipante || esOferenteSingular unParticipante 
 -- cobrarAlquileres: suma $10 por cada propiedad barata y $20 por cada propiedad cara obtenida. Las propiedades baratas son aquellas cuyo precio es menor a $150.
 
 cobrarAlquileres :: Accion
@@ -66,12 +77,13 @@ costoPropiedad unaPropiedad
 
 pagarAAccionistas :: Accion
 pagarAAccionistas unParticipante 
-    |esAccionista unParticipante = unParticipante {cantidadDeDinero = cambiarDinero unParticipante (200)}
-    |otherwise = unParticipante {cantidadDeDinero = cantidadDeDinero unParticipante - 100}
+    |esAccionista unParticipante = cambiarDinero (+200) unParticipante
+    |otherwise =   cambiarDinero (subtract 100) unParticipante
 
 esAccionista :: Participante -> Bool
-esAccionista  unParticipante = tipoDeParticipante unParticipante
+esAccionista  unParticipante = tacticaDeJuego unParticipante   == "Accionista" 
 
 
-tipoDeParticipante :: Participante -> Bool
-tipoDeParticipante unParticipante = tacticaDeJuego unParticipante == "Oferente singular" || tacticaDeJuego unParticipante   == "Accionista" 
+esOferenteSingular :: Participante -> Bool
+esOferenteSingular unParticipante = tacticaDeJuego unParticipante   == "Oferente singular" 
+
