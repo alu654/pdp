@@ -31,11 +31,12 @@ enojarse :: Accion
 enojarse unParticipante = (cambiarDinero (+50) . agregarAccion gritar) unParticipante
 
 agregarAccion :: Accion -> Accion
-agregarAccion  unAccion unParticipante  = unParticipante {accionesDelJuego = accionesDelJuego unParticipante ++ [unAccion]}
+agregarAccion  unAccion unParticipante  = unParticipante {accionesDelJuego =  unAccion : accionesDelJuego unParticipante}
 
 
 cambiarDinero ::  (Int->Int) -> Participante -> Participante
-cambiarDinero unaFuncion unParticipante = unParticipante { cantidadDeDinero = unaFuncion ( cantidadDeDinero unParticipante ) }
+cambiarDinero unaFuncion unParticipante = unParticipante { cantidadDeDinero = unaFuncion.cantidadDeDinero (unParticipante)} 
+
 
 
 -- gritar: agrega “AHHHH” al principio de su nombre.
