@@ -17,6 +17,10 @@ carolina = UnParticipante "Carolina" 500 "Accionista" [] [pasarPorElBanco, pagar
 manuel :: Participante
 manuel = UnParticipante "Manuel" 500 "Oferente singular" [] [pasarPorElBanco, enojarse] 
 
+cambiarDinero ::  (Int->Int) -> Participante -> Participante
+cambiarDinero unaFuncion unParticipante = unParticipante { cantidadDeDinero = unaFuncion.cantidadDeDinero (unParticipante)} 
+
+
 -- pasarPorElBanco: aumenta el dinero del jugador en $40 y cambia su táctica a “Comprador compulsivo”.
 
 pasarPorElBanco :: Accion
@@ -34,8 +38,6 @@ agregarAccion :: Accion -> Accion
 agregarAccion  unAccion unParticipante  = unParticipante {accionesDelJuego =  unAccion : accionesDelJuego unParticipante}
 
 
-cambiarDinero ::  (Int->Int) -> Participante -> Participante
-cambiarDinero unaFuncion unParticipante = unParticipante { cantidadDeDinero = unaFuncion.cantidadDeDinero (unParticipante)} 
 
 
 
