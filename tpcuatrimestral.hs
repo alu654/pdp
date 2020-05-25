@@ -32,11 +32,11 @@ autoDeTomy :: Auto
 autoDeTomy = Auto  "DJV214"  [ 0.5, 0.1, 0, 0.2 ] 1500 90 (10, 2, 2014) 
 
 autoDeAlan :: Auto
-autoDeAlan = Auto  "AA7664NB"  [ 0.6, 0.1, 0, 0.2 ] 2700 90 (5, 1, 2020) 
+autoDeAlan = Auto  "AA7664NB" [ 0.6, 0.1, 0, 0.2] 2700 90 (5, 1, 2020) 
 
 --Punto 1
 tamañoPatente :: Auto -> Int
-tamañoPatente unAuto= length (patente unAuto)
+tamañoPatente = length.patente 
 
 saberCosto :: Auto -> Int 
 saberCosto unAuto 
@@ -49,28 +49,32 @@ empiezaConEaM :: Caracteristica
 empiezaConEaM unAuto = elem (primeraLetra unAuto) ['E' .. 'M']
 
 empiezaConN :: Caracteristica
-empiezaConN unAuto = elem (take 2 (patente unAuto)) ["NA" , "NB"]
+empiezaConN unAuto = elem  (primerasLetras unAuto) ["NA" , "NB"]
 
 empiezaConD ::  Caracteristica
 empiezaConD unAuto = (primeraLetra unAuto) == 'D' && elem (segundaLetra unAuto) [ 'J' .. 'Z'] 
 
 segundaLetra :: Auto -> Char
-segundaLetra unAuto = head (tail (patente unAuto))
+segundaLetra = head.tail.patente 
 
 primeraLetra :: Auto -> Char
-primeraLetra unAuto = head (patente unAuto)
+primeraLetra = head.patente 
+
+primerasLetras :: Auto -> String
+primerasLetras = take 2. patente 
 
 estaEntreDJyNB :: Caracteristica
 estaEntreDJyNB unAuto=  empiezaConEaM unAuto  || empiezaConN unAuto  || empiezaConD unAuto
             
 terminaEn4 :: Caracteristica
-terminaEn4 unAuto = last (patente unAuto) == '4'
+terminaEn4 = (== '4').last.patente 
 
 calculoPatental:: Auto -> Int
 calculoPatental unAuto
         | terminaEn4 unAuto = 3000 * (tamañoPatente unAuto)
         | otherwise = 20000
 
+-- Punto 2
 -- Parte 1) Auto peligroso (integrante a)
 --Dado un auto, saber si es peligroso. Esta condición se cumple cuando el desgaste de la primera llanta es mayor a 0.5
 
@@ -84,8 +88,9 @@ esAutoPeligroso = (> 0.5).head.desgasteLlantas
 necesitaRevision :: Caracteristica 
 necesitaRevision= (>= 2015).anio.ultimoArreglo 
 
---Parte 3) 
-{-
+--Punto 3) 
+{- 
+Parte 1) Integrante a
 Necesitamos definir a las siguientes personas que realizan actividades en el taller mecánico:
 Alfa: hace que el auto regule a 2.000 vueltas, salvo que esté a menos de 2.000 vueltas, en cuyo caso lo deja como está
 Bravo: cambia todas las cubiertas, dejándolas sin desgaste
@@ -149,15 +154,15 @@ esImpar :: Int -> Bool
 esImpar numero = rem numero 2 /= 0
 
 estanOrdenados :: Auto -> Auto -> Bool
-estanOrdenados autoi autop =  esImpar (cantidadDesgaste autoi) && not (esImpar (cantidadDesgaste autop))
+estanOrdenados autoImpar autoPar =  esImpar (cantidadDesgaste autoImpar) && not (esImpar (cantidadDesgaste autoPar))
 
 cantidadDesgaste :: Auto -> Int
 cantidadDesgaste = round.(*10).sum.desgasteLlantas
 
 ordenamiento :: [Auto] -> Bool
-ordenamiento ( i : [ ] ) = esImpar (cantidadDesgaste i)
-ordenamiento ( i : p : [ ] ) = estanOrdenados i p
-ordenamiento ( i : p : autos) = estanOrdenados i p && ordenamiento autos 
+ordenamiento ( autoImpar : [ ] ) = esImpar (cantidadDesgaste autoImpar)
+ordenamiento ( autoImpar : autoPar : [ ] ) = estanOrdenados autoImpar autoPar
+ordenamiento ( autoImpar : autoPar : autos) = estanOrdenados autoImpar autoPar && ordenamiento autos 
 
 
 
@@ -204,9 +209,9 @@ el proceso) que cumplen dicha condición.
 
 {-Parte 2) Integrante b: Costo de reparación de autos que necesitan revisión
 En base al punto “Dada una lista de autos, saber cuál es el costo de reparación de los autos que necesitan revisión.”, 
- ¿podríamos tener una lista infinita de autos? Muestre un ejemplo y justifique. Y si tomáramos en cuenta los tres primeros autos que necesitan revisión,
-  ¿cómo debería cambiar la función? Por otra parte, ¿esta versión aceptaría una lista infinita de autos? Modifique la función 6.b 
-  con otro nombre y justifique sus respuestas.
+¿podríamos tener una lista infinita de autos? Muestre un ejemplo y justifique. Y si tomáramos en cuenta los tres primeros autos que necesitan revisión,
+¿cómo debería cambiar la función? Por otra parte, ¿esta versión aceptaría una lista infinita de autos? Modifique la función 6.b 
+con otro nombre y justifique sus respuestas.
 -}
 
 {- No, porque para calcular el auto de todos los autos que necesita revisión, primero se debería saber todos los autos que la necesitan.
