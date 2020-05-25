@@ -84,11 +84,6 @@ esAutoPeligroso = (> 0.5).head.desgasteLlantas
 necesitaRevision :: Caracteristica 
 necesitaRevision= (>= 2015).anio.ultimoArreglo 
 
-devuelveString :: Auto -> String
-devuelveString unAuto 
-    |  necesitaRevision unAuto = "No Necesita revision"
-    |  otherwise = "Necesita revision"
-
 --Parte 3) 
 {-
 Necesitamos definir a las siguientes personas que realizan actividades en el taller mecánico:
@@ -179,3 +174,65 @@ cambiarFecha unaFecha unAuto = unAuto {ultimoArreglo = unaFecha}
 
 ordenDeReparacion :: Fecha -> [Tecnico] -> Tecnico
 ordenDeReparacion unaFecha tecnicos = cambiarFecha unaFecha . (foldl1 (.) tecnicos)
+
+-- Punto 6
+
+{-Parte 1) Integrante a: Técnicos que dejan el auto en condiciones
+Dada una lista de técnicos determinar aquellos técnicos que dejarían el auto en condiciones (que no sea peligroso andar, recordar el punto 2.1 del integrante a).
+
+Parte 2) Integrante b: Costo de reparación de autos que necesitan revisión
+Dada una lista de autos, saber cuál es el costo de reparación de los autos que necesitan revisión.
+-}
+
+dejanElAutoEnCondiciones :: [Tecnico] -> Auto -> [Tecnico]
+dejanElAutoEnCondiciones tecnicos unAuto = filter  (not.esAutoPeligroso.($unAuto)) tecnicos
+        
+-- Parte 2
+costoDeAutosARevisar :: [Auto] -> [Int]
+costoDeAutosARevisar =  map saberCosto.filter necesitaRevision
+
+-- Punto 7
+{-Parte 1) Integrante a: Técnicos que dejan el auto en condiciones
+En base al punto “dada una lista de técnicos determinar qué técnicos dejarían el auto en condiciones” y considerando una lista de técnicos  infinita, ¿podríamos obtener el primer técnico que deja el auto en condiciones? Muestre un ejemplo y justifique. 
+-}
+
+{- Sí, podríamos saber cuál es el primer técnico que deja el auto en condiciones, ya que filter utiliza Lazy evaluation. 
+dejanElAutoEnCondiciones tecnicosInfinitos unAuto por ejemplo, viendo en consola, devuelve los primeros elementos (hasta que se interrumpa 
+el proceso) que cumplen dicha condición.
+-}
+
+
+{-Parte 2) Integrante b: Costo de reparación de autos que necesitan revisión
+En base al punto “Dada una lista de autos, saber cuál es el costo de reparación de los autos que necesitan revisión.”, 
+ ¿podríamos tener una lista infinita de autos? Muestre un ejemplo y justifique. Y si tomáramos en cuenta los tres primeros autos que necesitan revisión,
+  ¿cómo debería cambiar la función? Por otra parte, ¿esta versión aceptaría una lista infinita de autos? Modifique la función 6.b 
+  con otro nombre y justifique sus respuestas.
+-}
+
+{- No, porque para calcular el auto de todos los autos que necesita revisión, primero se debería saber todos los autos que la necesitan.
+Filter nunca dejaría de evaluar la lista de los autos para ello. Por lo tanto, nunca se le podría calcular el costo, ni siquiera al primero.
+Adaptando esta función para los primeros 3 autos que necesitan revisión (costoDeAutosARevisar'), igualmente no aceptaría listas infinitas, porque
+si la idea es tomar a los autos que SÍ necesitan revisión, primero se aplicaría el filter y volvemos a el problema de la pregunta anterior: no se
+pueden tomar 3 elementos de una lista que todavía no está definida y nunca lo estará.
+
+-}
+costoDeAutosARevisar' :: [Auto] -> [Int]
+costoDeAutosARevisar' =  map saberCosto.take 3.filter necesitaRevision
+
+
+
+tecnicosInfinitos = zulu:tecnicosInfinitos
+ 
+autosInfinitos :: [Auto]
+autosInfinitos = autosInfinitos' 0
+ 
+autosInfinitos' :: Int -> [Auto]
+autosInfinitos' n = Auto {
+ patente = "AAA000",
+ desgasteLlantas = [0, 0, 0, 0.3],
+ rpm = 1500 + n,
+ temperaturaAgua = 90,
+ ultimoArreglo = (20, 1, 2013)
+} : autosInfinitos' (n + 1)
+
+      
