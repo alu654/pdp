@@ -150,17 +150,14 @@ La cantidad de desgaste es la sumatoria de desgastes de las cubiertas de los aut
  es conveniente utilizar la función round.
 -}
 
-esImpar :: Int -> Bool
-esImpar numero = rem numero 2 /= 0
-
 estanOrdenados :: Auto -> Auto -> Bool
-estanOrdenados autoImpar autoPar =  esImpar (cantidadDesgaste autoImpar) && not (esImpar (cantidadDesgaste autoPar))
+estanOrdenados autoImpar autoPar =  (not.even.cantidadDesgaste) autoImpar && (even.cantidadDesgaste) autoPar
 
 cantidadDesgaste :: Auto -> Int
 cantidadDesgaste = round.(*10).sum.desgasteLlantas
 
 ordenamiento :: [Auto] -> Bool
-ordenamiento ( autoImpar : [ ] ) = esImpar (cantidadDesgaste autoImpar)
+ordenamiento ( autoImpar : [ ] ) = (even.cantidadDesgaste) autoImpar
 ordenamiento ( autoImpar : autoPar : [ ] ) = estanOrdenados autoImpar autoPar
 ordenamiento ( autoImpar : autoPar : autos) = estanOrdenados autoImpar autoPar && ordenamiento autos 
 
