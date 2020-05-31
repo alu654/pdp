@@ -46,7 +46,7 @@ saberCosto unAuto
 
 
 empiezaConEaM :: Caracteristica
-empiezaConEaM unAuto = elem (primeraLetra unAuto) ['E' .. 'M']
+empiezaConEaM unAuto = elem (primeraLetra unAuto) ['E' ..  'M']
 
 empiezaConN :: Caracteristica
 empiezaConN unAuto = elem  (primerasLetras unAuto) ["NA" , "NB"]
