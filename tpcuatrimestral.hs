@@ -7,7 +7,9 @@ type Patente = String
 type Fecha = (Int, Int, Int)
 type Caracteristica = Auto -> Bool
 type Tecnico = Auto -> Auto
+
 -- Definiciones base
+
 anio :: Fecha -> Int
 anio (_, _, year) = year
  
@@ -44,6 +46,7 @@ saberCosto unAuto
             | tamañoPatente unAuto > 7 = 12500
             | otherwise = 15000
 
+-- a mejorar con >< de caracteres (comparaciones)
 
 empiezaConEaM :: Caracteristica
 empiezaConEaM unAuto = elem (primeraLetra unAuto) ['E' ..  'M']
@@ -156,6 +159,8 @@ estanOrdenados autoImpar autoPar =  (not.even.cantidadDesgaste) autoImpar && (ev
 cantidadDesgaste :: Auto -> Int
 cantidadDesgaste = round.(*10).sum.desgasteLlantas
 
+-- a tener en cuanta : autoPar
+-- lista vacia 
 ordenamiento :: [Auto] -> Bool
 ordenamiento ( autoImpar : [ ] ) = (even.cantidadDesgaste) autoImpar
 ordenamiento ( autoImpar : autoPar : [ ] ) = estanOrdenados autoImpar autoPar
