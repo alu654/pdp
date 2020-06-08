@@ -46,28 +46,11 @@ saberCosto unAuto
             | tamañoPatente unAuto > 7 = 12500
             | otherwise = 15000
 
--- a mejorar con >< de caracteres (comparaciones)
-
-empiezaConEaM :: Caracteristica
-empiezaConEaM unAuto = elem (primeraLetra unAuto) ['E' ..  'M']
-
-empiezaConN :: Caracteristica
-empiezaConN unAuto = elem  (primerasLetras unAuto) ["NA" , "NB"]
-
-empiezaConD ::  Caracteristica
-empiezaConD unAuto = (primeraLetra unAuto) == 'D' && elem (segundaLetra unAuto) [ 'J' .. 'Z'] 
-
-segundaLetra :: Auto -> Char
-segundaLetra = head.tail.patente 
-
-primeraLetra :: Auto -> Char
-primeraLetra = head.patente 
-
 primerasLetras :: Auto -> String
 primerasLetras = take 2. patente 
 
 estaEntreDJyNB :: Caracteristica
-estaEntreDJyNB unAuto=  empiezaConEaM unAuto  || empiezaConN unAuto  || empiezaConD unAuto
+estaEntreDJyNB unAuto=  primerasLetras unAuto >= "DJ" &&  primerasLetras unAuto <= "NB"
             
 terminaEn4 :: Caracteristica
 terminaEn4 = (== '4').last.patente 
@@ -104,8 +87,11 @@ Charly:  realiza las mismas actividades que Alfa y Bravo
 cambiarRevoluciones ::  Int -> Tecnico
 cambiarRevoluciones rev unAuto = unAuto {rpm = rev}
 
+dejarEnCero :: Int -> Int
+dejarEnCero _ = 0
+
 cambiarCubiertas :: Tecnico
-cambiarCubiertas unAuto = unAuto{desgasteLlantas = [0,0,0,0]}
+cambiarCubiertas unAuto = unAuto{desgasteLlantas = map dejarEnCero (desgasteLlantas unAuto)}
 
 alfa :: Tecnico
 alfa unAuto 
@@ -159,13 +145,11 @@ estanOrdenados autoImpar autoPar =  (not.even.cantidadDesgaste) autoImpar && (ev
 cantidadDesgaste :: Auto -> Int
 cantidadDesgaste = round.(*10).sum.desgasteLlantas
 
--- a tener en cuanta : autoPar
--- lista vacia 
-ordenamiento :: [Auto] -> Bool
-ordenamiento ( autoImpar : [ ] ) = (even.cantidadDesgaste) autoImpar
-ordenamiento ( autoImpar : autoPar : [ ] ) = estanOrdenados autoImpar autoPar
-ordenamiento ( autoImpar : autoPar : autos) = estanOrdenados autoImpar autoPar && ordenamiento autos 
-
+--corregi
+ordenamiento' :: [Auto] -> Bool
+ordenamiento' [] = True
+ordenamiento' [unicoAuto] = (even.cantidadDesgaste) unicoAuto
+ordenamiento' (primerAuto : segundoAuto : autos) = estanOrdenados primerAuto segundoAuto && ordenamiento autos 
 
 
 {-Punto 5: Orden de reparación
@@ -187,16 +171,18 @@ ordenDeReparacion unaFecha tecnicos = cambiarFecha unaFecha . (foldl1 (.) tecnic
 {-Parte 1) Integrante a: Técnicos que dejan el auto en condiciones
 Dada una lista de técnicos determinar aquellos técnicos que dejarían el auto en condiciones (que no sea peligroso andar, recordar el punto 2.1 del integrante a).
 
+
 Parte 2) Integrante b: Costo de reparación de autos que necesitan revisión
 Dada una lista de autos, saber cuál es el costo de reparación de los autos que necesitan revisión.
 -}
 
 dejanElAutoEnCondiciones :: [Tecnico] -> Auto -> [Tecnico]
 dejanElAutoEnCondiciones tecnicos unAuto = filter  (not.esAutoPeligroso.($unAuto)) tecnicos
-        
+
 -- Parte 2
+-- sumatoria 
 costoDeAutosARevisar :: [Auto] -> [Int]
-costoDeAutosARevisar =  map saberCosto.filter necesitaRevision
+costoDeAutosARevisar =  sum.map saberCosto.filter necesitaRevision
 
 -- Punto 7
 {-Parte 1) Integrante a: Técnicos que dejan el auto en condiciones
@@ -205,7 +191,8 @@ En base al punto “dada una lista de técnicos determinar qué técnicos dejar�
 
 {- Sí, podríamos saber cuál es el primer técnico que deja el auto en condiciones, ya que filter utiliza Lazy evaluation. 
 dejanElAutoEnCondiciones tecnicosInfinitos unAuto por ejemplo, viendo en consola, devuelve los primeros elementos (hasta que se interrumpa 
-el proceso) que cumplen dicha condición.
+el proceso) que cumplen dicha condición. Sin embargo, si ningún técnico deja el auto en condiciones, la función lo buscará hasta el fin de 
+los tiempos sin encontrarlo para mostrarlo.
 -}
 
 
@@ -218,14 +205,14 @@ con otro nombre y justifique sus respuestas.
 
 {- No, porque para calcular el auto de todos los autos que necesita revisión, primero se debería saber todos los autos que la necesitan.
 Filter nunca dejaría de evaluar la lista de los autos para ello. Por lo tanto, nunca se le podría calcular el costo, ni siquiera al primero.
-Adaptando esta función para los primeros 3 autos que necesitan revisión (costoDeAutosARevisar'), igualmente no aceptaría listas infinitas, porque
-si la idea es tomar a los autos que SÍ necesitan revisión, primero se aplicaría el filter y volvemos a el problema de la pregunta anterior: no se
-pueden tomar 3 elementos de una lista que todavía no está definida y nunca lo estará.
-
+Adaptando esta función para los primeros 3 autos que necesitan revisión (costoDeAutosARevisar'), aceptaría listas infinitas, porque trabaja 
+con lazy evaluation y puede trabajar con los tres primeros elementos que devuelve el filter. 
+  Sin embargo, si ningún auto necesita revisión, 
+el filter buscará autos hasta el fin de los tiempos y nunca se terminaría de ejecutar el algoritmo.
 -}
+
 costoDeAutosARevisar' :: [Auto] -> [Int]
 costoDeAutosARevisar' =  map saberCosto.take 3.filter necesitaRevision
-
 
 
 tecnicosInfinitos = zulu:tecnicosInfinitos
