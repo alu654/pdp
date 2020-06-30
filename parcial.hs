@@ -124,7 +124,7 @@ letras se pierden en el camino.-}
 
 type Ingredientes = String
 largaDistancia :: Comida -> Comida 
-largaDistancia comida = aumentarCosto 50 ((ingredientesFiltrados ingredientes) comida)
+largaDistancia comida = aumentarCosto 50 (ingredientesFiltrados ingredientes comida)
 
 aumentarCosto:: Int -> Comida -> Comida
 aumentarCosto monto comida= comida {costo = (costo comida) + monto}
