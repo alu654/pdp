@@ -1,5 +1,6 @@
 
 /*Tía Agatha, el carnicero y Charles son las únicas personas que viven en la mansión Dreadbury.*/
+
 viveEnLaMansion(tiaAgatha).
 viveEnLaMansion(elCarnicero).
 viveEnLaMansion(charles).
@@ -7,7 +8,7 @@ viveEnLaMansion(milhouse).
 
  %Charles odia a todas las personas de la mansión que no son odiadas por la tía Agatha.
 odia(charles, OtraPersona):-
-    odia(tiaAgatha,OtraPersona).
+    not(odia(tiaAgatha,OtraPersona)).
 
 
 % Agatha odia a todos los que viven en la mansión, excepto al carnicero.
@@ -16,8 +17,8 @@ odia(tiaAgatha, OtraPersona):-
     OtraPersona \= elCarnicero.
 
 %El carnicero odia a las mismas personas que odia tía Agatha.
-odia(elCarnicero,_):-
-    odia(tiaAgatha, _).
+odia(elCarnicero,UnaPersona):-
+    odia(tiaAgatha, UnaPersona).
 
 
 %Quien no es odiado por el carnicero y vive en la mansión, es más rico que tía Agatha
@@ -31,9 +32,9 @@ mata(Persona,OtraPersona):-
     not(esMAsRico(Persona,OtraPersona)),
     viveEnLaMansion(Persona).
 
-%b
+
 /*mata(Alguien, tiaAgatha).
-Alguien = charles */
+Alguien = tiaAgatha */
 
 /*?- odia(Alguien, milhouse).
 Alguien = elCarnicero ;
