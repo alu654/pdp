@@ -50,5 +50,18 @@ Alguien = elCarnicero.*/
 /*dia(elCarnicero, _).
 true .*/
 
+/*Queremos saber si un libro está bueno, esto se cumple cuando:
+- Es una novela policial y tiene menos de 12 capítulos.
+- Es una novela de terror.
+- Los libros con más de 10 cuentos siempre son buenos.
+- Es un libro científico de fisicaCuantica.
+- Es un best seller y el precio por página es menor a $50.
+estaBueno/1
+*/
+
+estaBueno(Obra):-
+    esNovelaPolicial(Artista,cantCapitulos),
+    cantPaginas < 12
 
 
+esNovelaPolicial

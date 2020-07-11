@@ -62,7 +62,7 @@ cambiarDinero plata persona = persona {dinero = dinero persona - plata}
 
 comidaFav :: Comida->Persona->Persona
 comidaFav comida persona | costo comida < 200 = agregarComida comida persona
-                                            | otherwise = persona
+                         | otherwise = persona
 
 agregarComida :: Comida->Persona->Persona
 agregarComida comida persona = persona {comidaFavorita =  comida : (comidaFavorita persona)  }
@@ -83,7 +83,7 @@ semanaVegana comida | esVegana comida= descuentosDecomida (div (costo comida) 2)
 esVegana ::Comida ->Bool
 esVegana comida = any esComidaVegana (ingredientes comida)
 
-esComidaVegana ::String ->Bool
+esComidaVegana :: String ->Bool
 esComidaVegana comida = "carne"==comida || "huevos"==comida || "queso"==comida
 
 descuentosDecomida:: Int ->Comida->Comida
@@ -100,7 +100,7 @@ esoNoesCoca bebida comida = comida {nombreComida = nombreComida comida ++ "Party
 
 --sinTACCis: a todos los ingredientes les agrega "libre de gluten" al final.
 sinTACC  :: Comida -> Comida
-sinTACC comida = comida {ingredientes = map (\ ing -> ing ++ " libre de gluten") (ingredientes comida)}
+sinTACC comida = comida {ingredientes = map(\ ing -> ing ++ " libre de gluten") (ingredientes comida)}
 
 --findeVegetariano: en caso que la comida a comprar no contenga carne, el costo se reduce en un 30%.
 
@@ -109,14 +109,19 @@ findeVegetariano unaComida unaPersona = comprar (vegetariano unaComida unaPerson
 
 vegetariano :: Comida -> Persona -> Comida
 vegetariano unaComida unaPersona
-    | noTieneIngredientes "carne" unaComida =cambiarCosto (+ (sacarPorcentaje 30)) unaComida
+    | noTieneIngredientes "carne" unaComida =cambiarCosto (cambiarCosto ( costo unaComida - (sacarPorcentaje 30)) unaComida $ unaComida
     | otherwise = unaComida
+                     
 
 sacarPorcentaje :: Int -> Int
 sacarPorcentaje unValor = div unValor 100
 
 cambiarCosto :: Int -> Comida -> Comida
 cambiarCosto n comida = comida {costo = costo comida * n}
+
+noTieneIngredientes :: String ->Comida -> Bool
+noTieneIngredientes esCarne unaComida = any(==esCarne) . ingredientes $ unaComida 
+
 
 {-largaDistancia: este cupón es muy útil para las personas que viven lejos. Por solo $50 pesos mas, Pdeppi puede llevar la comida hasta tu casa. 
 ¡Al parecer la cantidad de letras de un ingrediente afecta su peso! Así que, lamentablemente, todos los ingredientes que tienen más de 10 
