@@ -70,12 +70,19 @@ cantidadDeHabitantes(misiones, 1189446).
 % No aparece Formosa en la lista del partido Rojo porque no se presenta, así como hay otras más de 10 provincias que aparecen.
 
 % Punto 2)
-esPicante(Provincia):-
+tieneMasDeUnMillonHabitantes(Provincia):-
     cantidadDeHabitantes(Provincia, Cantidad),
-    Cantidad > 1000000,
+    Cantidad > 1000000.
+
+sePresentanPorLoMenosDosPartidos(Provincia):-
     sePostulaEn(UnPartido, Provincia),
     sePostulaEn(OtroPartido, Provincia),
     UnPartido \= OtroPartido.
+
+esPicante(Provincia):-  
+    tieneMasDeUnMillonHabitantes(Provincia),
+    sePresentanPorLoMenosDosPartidos(Provincia).
+
 
 % Punto 3)
 intencionDeVotoEn(buenosAires, rojo, 40).
@@ -124,37 +131,53 @@ intencionDeVotoEn(misiones, rojo, 90).
 intencionDeVotoEn(misiones, azul, 0).
 intencionDeVotoEn(misiones, amarillo, 0).
 
-leGanaA(Ganador, Perdedor, Provincia):-
-    esDelPartido(Ganador, PartidoGan),
-    esDelPartido(Perdedor, PartidoPer),
-    sePostulaEn(PartidoGan, Provincia),
-    not(sePostulaEn(PartidoPer, Provincia)).
 
 leGanaA(Ganador, Perdedor, Provincia):-
     esDelPartido(Ganador, PartidoGan),
     esDelPartido(Perdedor, PartidoPer),
     sePostulaEn(PartidoGan, Provincia),
+    esGanador(Provincia, PartidoGan, PartidoPer).
+
+esGanador(Provincia, _, PartidoPer):-
+    not(sePostulaEn(PartidoPer, Provincia)).
+
+esGanador(Provincia, PartidoGan, PartidoPer):-
     sePostulaEn(PartidoPer, Provincia),
     PartidoGan \= PartidoPer,
     intencionDeVotoEn(Provincia, PartidoGan, PorcentajeGan),
     intencionDeVotoEn(Provincia, PartidoPer, PorcentajePer),
     PorcentajeGan > PorcentajePer.
 
-leGanaA(Ganador, Perdedor, Provincia):-
-    esDelPartido(Ganador, Partido),
-    esDelPartido(Perdedor, Partido),
-    sePostulaEn(Partido, Provincia).
+esGanador(_, Partido, Partido).
 
 % Punto 4)
-elGranCandidato(UnCandidato):- 
-    esDelPartido(UnCandidato, UnPartido),
-    sePostulaEn(UnPartido, Provincia),
-    leGanaA(UnCandidato, _, Provincia),
-    esDelPartido(OtroCandidato, UnPartido),
-    edad(UnCandidato, EdadUnCandidato),
-    edad(OtroCandidato, EdadOtroCandidato),
-    EdadUnCandidato \= EdadOtroCandidato.
 
+sePostulanEn(Partido, OtroPartido, Provincia):-
+    sePostulaEn(Partido, Provincia),
+    sePostulaEn(OtroPartido, Provincia),
+    Partido \= OtroPartido.
+
+ganaEnTodasLasProvinciasElPartido(Partido):-
+    forall(sePostulanEn(Partido, OtroPartido, Provincia), esGanador(Provincia, Partido, OtroPartido)).
+
+edadDeOtroCandidatoDelPartido(Partido, UnCandidato, Edad):-
+    esDelPartido(OtroCandidato, Partido),
+    edad(OtroCandidato, Edad),
+    UnCandidato \= OtroCandidato.
+
+esElMenorDelPartido(UnCandidato, Partido):-
+    esDelPartido(UnCandidato, Partido),
+    edad(UnCandidato, EdadUnCandidato),
+    forall(edadDeOtroCandidatoDelPartido(Partido, UnCandidato, EdadOtroCandidato), EdadUnCandidato < EdadOtroCandidato ).
+
+elGranCandidato(UnCandidato):-
+    esElMenorDelPartido(UnCandidato, Partido),
+    ganaEnTodasLasProvinciasElPartido(Partido).
+
+% LO RESOLVIMOS CON AYUDA DE GUS. Al final lo resolvimos adoptando la idea de que el partido es el que 
+% gana en una provincia a otro partido. Después, si tienen ganas, nos explican cómo se resuelve con
+% leGanaA
+        
 % Porque al consultar ?- elGranCandidato(UnCandidato). 
 % La única respuesta es UnCandidato = frank .
 % Está relacionado con el concepto de unificación y de ligar a una variable a un único candidato que cumple el predicado.
@@ -169,11 +192,105 @@ partidoPierdeEn(Partido, Provincia):-
 
 ajusteConsultora(Partido, Provincia, RealPorcentaje):-
     intencionDeVotoEn(Provincia, Partido, Porcentaje),
+    actualizacionDePorcentaje(Partido, Provincia, RealPorcentaje, Porcentaje).
+
+actualizacionDePorcentaje(Partido, Provincia, RealPorcentaje, Porcentaje):-
     partidoPierdeEn(Partido, Provincia),
     RealPorcentaje is Porcentaje + 5.
 
-ajusteConsultora(Partido, Provincia, RealPorcentaje):-
-    intencionDeVotoEn(Provincia, Partido, Porcentaje),
+actualizacionDePorcentaje(Partido, Provincia, RealPorcentaje, Porcentaje):-
     not(partidoPierdeEn(Partido, Provincia)),
     RealPorcentaje is Porcentaje - 20.
+
+% Punto 6) 
+
+%inflacion(CotaInferior, CotaSuperior).
+%construir(ListaDeObras).
+%nuevosPuestosDeTrabajo(Cantidad).
+
+%edilicio(Edilicio, Cantidad).
+
+promete(azul, inflacion(2, 4)).
+promete(amarillo, inflacion(1, 15)).
+promete(rojo, inflacion(10, 30)).
+
+promete(rojo, nuevosPuestosDeTrabajo(800000)).
+promete(amarillo, nuevosPuestosDeTrabajo(10000)).
+
+promete(azul, construir([edilicio(hospitales, 1000), edilicio(jardines, 100), edilicio(escuelas, 5)])).
+promete(amarillo, construir([edilicio(hospitales, 100), edilicio(universidades, 1), edilicio(comisarias, 200)])).
+
+% Cambiamos la base de datos con gus. Dejamos comentado cómo lo teniamos antes, que lógicamente está bien 
+% Pero nos daba resultados no deseados en las consultas del punto 8
+
+%promete(Partido, construir(ListaDeObras)):-
+%    ediliciosPrometidos(Partido, _),
+%    findall(edilicio(Edilicio, Cantidad), ediliciosPrometidos(Partido, edilicio(Edilicio, Cantidad)), ListaDeObras).
+
+%ediliciosPrometidos(azul, edilicio(hospitales, 1000)).
+%ediliciosPrometidos(azul, edilicio(jardines, 100)).
+%ediliciosPrometidos(azul, edilicio(escuelas, 5)).
+%ediliciosPrometidos(amarillo, edilicio(hospitales, 100)).
+%ediliciosPrometidos(amarillo, edilicio(universidades, 1)).
+%ediliciosPrometidos(amarillo, edilicio(comisarias, 200)).
+
+% Punto 7)
+
+% influenciaDePromesas(Promesa, Intencion).
+
+/*Para la inflación, la intención de votos 
+disminuirá de manera directamente proporcional al promedio de las cotas de la promesa realizada.*/
+
+esEdilicioEducativo(jardines).
+esEdilicioEducativo(escuelas).
+esEdilicioNecesario(hospitales).
+esEdilicioNecesario(comisarias).
+esEdilicioNecesario(universidades).
+
+influenciaDePromesas(inflacion(CotaInferior, CotaSuperior), Intencion):-
+    Intencion is (CotaInferior + CotaSuperior) / (-2).
+
+influenciaDePromesas(nuevosPuestosDeTrabajo(Cantidad), Intencion):-
+    Cantidad > 50000,
+    Intencion is 3.
+
+influenciaDePromesas(nuevosPuestosDeTrabajo(Cantidad), 0):-
+    Cantidad =< 50000.
+
+influenciaDePromesas(construir(ListaDeObras), Sumatoria):-
+    findall(Intencion, intencionPorObras(construir(ListaDeObras), Intencion), Porcentajes),
+    sum_list(Porcentajes, Sumatoria).
+    
+intencionPorObras(construir([]), 0).
+
+intencionPorObras(construir(ListaDeObras), 2):-
+    member(edilicio(hospitales, _), ListaDeObras).
+
+intencionPorObras(construir(ListaDeObras), Intencion):-
+    member(edilicio(Edilicio, Cantidad), ListaDeObras),
+    esEdilicioEducativo(Edilicio),
+    Intencion is Cantidad / 10.
+
+intencionPorObras(construir(ListaDeObras), 2):-
+    member(edilicio(comisarias, 200), ListaDeObras).
+
+intencionPorObras(construir(ListaDeObras), 0):-
+    member(edilicio(universidades, _), ListaDeObras).
+
+intencionPorObras(construir(ListaDeObras), -1):-
+    member( edilicio(Edilicio, _), ListaDeObras),
+    not(esEdilicioEducativo(Edilicio)),
+    not(esEdilicioNecesario(Edilicio)).
+
+% Punto 8)
+
+porcentajePorPromesa(Partido, Intencion):-
+    promete(Partido, Promesa),
+    influenciaDePromesas(Promesa, Intencion).
+
+promedioDeCrecimiento(Partido, Promedio):-
+    promete(Partido, _),
+    findall(Intencion, porcentajePorPromesa(Partido, Intencion), TodasLasIntenciones),
+    sum_list(TodasLasIntenciones, Promedio).
+
 
