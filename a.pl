@@ -109,13 +109,4 @@ La nueva empresa que se suma a esta gran familia es Vertigo, pero aún no cuenta
 %esSalaDe(NombreSala, Empresa).
 %sala(Nombre, Experiencia).
 
-%Lo agregue en la base de conocimiento 
-    
-
-
-
-
-
-
-    
-    
+%Lo agregue en la base de conocimiento
